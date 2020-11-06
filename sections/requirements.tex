@@ -1,0 +1,56 @@
+\section{Requirements}
+\begin{enumerate}[noitemsep]
+
+  \item MUST allow for the following values to be configurable:
+
+    \begin{enumerate}[noitemsep]
+      \item $A_\mathrm{BTC}$: Account A Bitcoin address
+      \item $B_\mathrm{BTC}$: Account B Bitcoin address
+      \item $A_\mathrm{wXLM}$: Account A Stellar address
+      \item $B_\mathrm{wXLM}$: Account B Stellar address
+      \item $X_\mathrm{BTC}$: Amount of Bitcoin in sats that $B_\mathrm{BTC}$ sends to $A_\mathrm{BTC}$
+      \item $X_\mathrm{wXLM}$: Amount of wrapped Stellar tokens that $A_\mathrm{wXLM}$ mints and sends to that $B_\mathrm{wXLM}$
+      \item $n_c$: Number of required confirmations on the Bitcoin blockchain
+    \end{enumerate}
+
+  \item MUST listen for incoming $X_\mathrm{BTC}$ to $A_\mathrm{BTC}$ from $B_\mathrm{BTC}$
+
+  \item After $A_\mathrm{BTC}$ has received $X_\mathrm{BTC}$ from $B_\mathrm{BTC}$, MUST listen for and wait until $n_c$ confirmations has been achieved
+
+  \item After $n_c$ confirmations has been achieved, $A_\mathrm{wXLM}$ MUST mint $X_\mathrm{wXLM}$ tokens
+
+  \item After tokens have been minted, $A_\mathrm{wXLM}$ MUST send $X_\mathrm{wXLM}$ tokens to $B_\mathrm{wXLM}$\\
+  \\
+  \par
+
+  \item MUST send a notification event when:
+
+    \begin{enumerate}[noitemsep]
+      \item The transaction for $X_\mathrm{BTC}$ is sent to $A_\mathrm{BTC}$ from $B_\mathrm{BTC}$
+      \item The transaction for $X_\mathrm{BTC}$ sent to $A_\mathrm{BTC}$ from $B_\mathrm{BTC}$ has $n_c$ confirmations
+      \item $A_\mathrm{wXLM}$ mints $X_\mathrm{wXLM}$
+      \item $A_\mathrm{wXLM}$ sends $X_\mathrm{wXLM}$ to $B_\mathrm{wXLM}$
+      \item Insufficient amounts are received by $A_\mathrm{BTC}$
+    \end{enumerate}
+
+  \item MUST work on testnet and mainnet
+
+  \item SHOULD support legacy and segwit Bitcoin addresses, and MUST clearly state in the documentation which address types are supported
+
+\end{enumerate}
+
+\noindent
+The following two scenarios (both of which are related to the sending of inaccurate Bitcoin amounts by $B_\mathrm{BTC}$) are considered edge cases for the purpose of this proof-of-concept proposal and will NOT be included in the requirements.
+It is of \textbf{critical importance} to handle these scenarios if Tokensoft does decide to proceed with the integration of Stellar into the Wrapped platform.
+If Tokensoft does want to handle these cases properly at this stage, the proposal can be revised.
+
+\begin{enumerate}[noitemsep]
+  \item The amount sent from $B_\mathrm{BTC}$ is too little:\\
+  An event notification will be fired indicating the amount, but no further action will take place.
+  $A_\mathrm{BTC}$ will keep the Bitcoin and wait for a new transaction from $B_\mathrm{BTC}$ with the requirement amount.
+  Note, the scripts will not monitor for the total balance of Bitcoin received by $A_\mathrm{BTC}$, but rather will monitor for a single transaction with the minimum required amount to proceed.
+
+  \item The amount sent from $B_\mathrm{BTC}$ is too much:\\
+  An event notification will be fired indicating the amount, and the scripts will continue to be executed normally. 
+  $A_\mathrm{BTC}$ will not be equipped with the functionality of sending back change, or sending any BTC transaction for that matter. 
+\end{enumerate}

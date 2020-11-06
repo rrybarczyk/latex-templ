@@ -4,7 +4,6 @@ default:
 build:
     just clean
     pdflatex main
-    bibtex main
     pdflatex main
     pdflatex main
 
